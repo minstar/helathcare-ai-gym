@@ -50,7 +50,7 @@ browser loads `assets/` over `http://` rather than `file://`.)
 ## Citation
 
 ```bibtex
-@article{jeong2026healthcareaigym,
+@article{jeong2026healthcare,
   title   = {Healthcare AI GYM for Medical Agents},
   author  = {Jeong, Minbyul},
   journal = {arXiv preprint arXiv:2605.02943},
