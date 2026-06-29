@@ -69,6 +69,7 @@ em{font-style:italic;color:var(--ink)}
 .hero__authors{margin:1.7rem 0 .2rem;font-size:1.05rem}
 .hero__authors a{color:#eaf2f1;text-decoration:none;font-weight:600;border-bottom:1px solid rgba(234,242,241,.35);padding-bottom:1px}
 .hero__authors a:hover{border-color:#7fe7d8;color:#7fe7d8}
+.hero__affil{margin-top:.4rem;font-size:.92rem;font-weight:500;color:#9fb1b4;letter-spacing:.01em}
 .hero__buttons{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin:2rem 0 0}
 .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.95rem;text-decoration:none;
   padding:.62rem 1.05rem;border-radius:11px;background:rgba(255,255,255,.07);color:#eaf2f1;
