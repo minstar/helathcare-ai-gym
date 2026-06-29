@@ -4,8 +4,7 @@
 [![Page](https://img.shields.io/badge/project-page-0d9488.svg)](https://minstar.github.io/helathcare-ai-gym/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-Project / landing page for the paper **“Healthcare AI GYM: A Comprehensive Empirical
-Study of Multi-Turn Agentic RL for Medical AI.”**
+Project / landing page for the paper **“Healthcare AI GYM for Medical Agents”** (arXiv 2605.02943).
 
 🔗 **Live page:** https://minstar.github.io/helathcare-ai-gym/
 
@@ -52,8 +51,7 @@ browser loads `assets/` over `http://` rather than `file://`.)
 
 ```bibtex
 @article{jeong2026healthcareaigym,
-  title   = {Healthcare AI GYM: A Comprehensive Empirical Study of
-             Multi-Turn Agentic RL for Medical AI},
+  title   = {Healthcare AI GYM for Medical Agents},
   author  = {Jeong, Minbyul},
   journal = {arXiv preprint arXiv:2605.02943},
   year    = {2026}
