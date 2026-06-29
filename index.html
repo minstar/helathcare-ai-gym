@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Healthcare AI GYM — Multi-Turn Agentic RL for Medical AI</title>
+<meta name="description" content="Healthcare AI GYM: a Gymnasium-compatible environment for training medical AI agents through multi-turn clinical tool use, with the TT-OPD self-distillation framework. A comprehensive empirical study of multi-turn agentic RL for medical AI." />
+<meta property="og:title" content="Healthcare AI GYM — Multi-Turn Agentic RL for Medical AI" />
+<meta property="og:description" content="A Gymnasium-compatible medical-agent environment (10 domains · 135 tools · 828K-passage KB · 5D reward) and TT-OPD, a self-distillation framework that stabilizes multi-turn agentic RL." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0d9488" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opt@1,8..72&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230d9488'/><path d='M50 24v52M24 50h52' stroke='white' stroke-width='12' stroke-linecap='round'/></svg>" />
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <a class="nav__brand" href="#top">
+    <span class="nav__logo" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><rect width="100" height="100" rx="24"/><path d="M50 26v48M26 50h48" stroke-linecap="round"/></svg>
+    </span>
+    <span>Healthcare AI <b>GYM</b></span>
+  </a>
+  <div class="nav__links">
+    <a href="#workflow">Workflow</a>
+    <a href="#contributions">Contributions</a>
+    <a href="#environment">Environment</a>
+    <a href="#ttopd">TT-OPD</a>
+    <a href="#results">Results</a>
+    <a href="#analysis">Analysis</a>
+    <a href="#cite">Cite</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__inner">
+    <div class="hero__venue">Preprint · <span>arXiv 2605.02943</span></div>
+    <h1 class="hero__title">Healthcare&nbsp;AI&nbsp;<span class="grad">GYM</span></h1>
+    <p class="hero__subtitle">A Comprehensive Empirical Study of Multi-Turn Agentic RL for Medical AI</p>
+
+    <div class="hero__authors">
+      <a href="https://github.com/minstar" target="_blank" rel="noopener">Minbyul&nbsp;Jeong</a>
+    </div>
+
+    <div class="hero__buttons">
+      <a class="btn btn--dark" href="https://arxiv.org/abs/2605.02943" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" class="btn__i"><path d="M5 3h9l5 5v13a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> Paper
+      </a>
+      <a class="btn" href="https://arxiv.org/pdf/2605.02943" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" class="btn__i"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg> PDF
+      </a>
+      <a class="btn" href="https://github.com/minstar/helathcare-ai-gym" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" class="btn__i"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 00-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0019.9 5 4.9 4.9 0 0019.8.8S18.5.4 15.5 2.4a13 13 0 00-7 0C5.5.4 4.2.8 4.2.8A4.9 4.9 0 004.1 5a5.2 5.2 0 00-1.4 3.6c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 00-.9 2.5V22"/></svg> Code
+      </a>
+      <a class="btn" href="#cite">
+        <svg viewBox="0 0 24 24" class="btn__i"><path d="M6 4h9l4 4v12H6zM4 8h2M4 12h2M4 16h2"/></svg> BibTeX
+      </a>
+    </div>
+
+    <ul class="hero__stats">
+      <li><b>10</b><span>clinical domains</span></li>
+      <li><b>135</b><span>clinical tools</span></li>
+      <li><b>3.6K+</b><span>tasks</span></li>
+      <li><b>828K</b><span>KB passages</span></li>
+      <li><b>18</b><span>benchmarks</span></li>
+      <li class="hl"><b>+3.9pp</b><span>over baseline</span></li>
+    </ul>
+  </div>
+  <a class="hero__scroll" href="#abstract" aria-label="Scroll down"><span></span></a>
+</header>
+
+<main>
+
+<!-- ============ ABSTRACT ============ -->
+<section class="section section--narrow" id="abstract">
+  <div class="kicker">Abstract</div>
+  <p class="lead">
+    Clinical reasoning demands multi-step interactions — gathering patient history, ordering tests,
+    interpreting results, and making safe treatment decisions — yet no unified environment exists to
+    train generalizable medical AI agents through reinforcement learning. We present a comprehensive
+    empirical study of multi-turn agentic RL for medical AI, built on <b>Healthcare&nbsp;AI&nbsp;GYM</b>, a
+    Gymnasium-compatible environment spanning 10 clinical domains with 3.6K+ tasks and domain-specific tools.
+  </p>
+  <p>
+    Our analysis reveals three compounding pathologies absent from single-turn settings:
+    <em>response explosion</em>, <em>multi-turn collapse</em> into verbose monologues, and
+    <em>distillation instability</em> — all stemming from the misalignment of sparse terminal rewards with
+    sequential clinical trajectories. To stabilize training, we propose
+    <b>Turn-Level Truncated On-Policy Distillation (TT-OPD)</b>, a self-distillation framework where a
+    gradient-free EMA teacher provides dense, outcome-aware KL regularization at every conversation turn —
+    achieving accuracy comparable to vanilla GRPO with controlled response length and sustained tool use.
+    We further identify a fundamental <em>agentic–textual transfer gap</em>: RL improves procedural
+    competence but does not transfer to text-based QA benchmarks. The environment, training pipeline, and
+    all experimental artifacts are publicly available.
+  </p>
+</section>
+
+<!-- ============ ANIMATED WORKFLOW (FIGURE 1) ============ -->
+<section class="section section--wide workflow" id="workflow">
+  <div class="kicker">How it works</div>
+  <h2 class="h2">The overall workflow, step by step</h2>
+  <p class="section-intro">
+    Healthcare AI GYM closes the loop between a clinical agent, a Gymnasium environment, a tool &amp;
+    knowledge ecosystem, and a reward-driven RL trainer. Press <b>Play</b> to watch a single training
+    episode flow through the system — each step highlights one component and explains what it does.
+  </p>
+
+  <div class="diagram" id="archDiagram">
+    <!-- ===== SVG SCENE ===== -->
+    <div class="diagram__stage">
+      <svg viewBox="0 0 1180 540" class="scene" id="archScene" role="img"
+           aria-label="Animated architecture of Healthcare AI GYM">
+        <defs>
+          <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="5" result="b"/><feMerge>
+            <feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" class="arrowhead"/>
+          </marker>
+        </defs>
+
+        <!-- ===== WIRES (drawn first, under nodes) ===== -->
+        <g class="wires">
+          <path id="w-act"     class="wire" data-c="agent" marker-end="url(#arrow)" d="M245 238 L350 238"/>
+          <path id="w-obs"     class="wire" data-c="gym"   marker-end="url(#arrow)" d="M350 292 L245 292"/>
+          <path id="w-calls"   class="wire" data-c="tools" marker-end="url(#arrow)" d="M605 178 L712 178"/>
+          <path id="w-results" class="wire" data-c="tools" marker-end="url(#arrow)" d="M712 214 L605 214"/>
+          <path id="w-kbq"     class="wire" data-c="kb"    marker-end="url(#arrow)" d="M605 352 L712 352"/>
+          <path id="w-kbret"   class="wire" data-c="kb"    marker-end="url(#arrow)" d="M712 388 L605 388"/>
+          <path id="w-tau"     class="wire wire--arc" data-c="reward" marker-end="url(#arrow)"
+                d="M475 112 C 475 46, 1070 46, 1070 126"/>
+          <path id="w-reward"  class="wire" data-c="rl" marker-end="url(#arrow)" d="M1070 252 L1070 300"/>
+          <path id="w-update"  class="wire wire--arc" data-c="rl" marker-end="url(#arrow)"
+                d="M1070 426 L1070 486 Q 1070 506 1050 506 L 160 506 Q 140 506 140 486 L 140 340"/>
+          <!-- labels -->
+          <text class="wlab" x="297" y="228">action aₜ</text>
+          <text class="wlab" x="297" y="312">obs sₜ₊₁</text>
+          <text class="wlab" x="658" y="168">call</text>
+          <text class="wlab" x="650" y="232">result</text>
+          <text class="wlab" x="658" y="342">query</text>
+          <text class="wlab" x="643" y="406">passages</text>
+          <text class="wlab" x="772" y="40">trajectory τ</text>
+          <text class="wlab" x="1082" y="282" text-anchor="start">R<tspan dy="3" font-size="9">total</tspan></text>
+          <text class="wlab" x="590" y="524" text-anchor="middle">∇θ ℒ — update agent (GRPO + TT-OPD)</text>
+        </g>
+
+        <!-- ===== NODES ===== -->
+        <!-- Agent -->
+        <g class="node" id="n-agent" data-c="agent">
+          <rect x="40" y="186" width="205" height="150" rx="16"/>
+          <text class="n-ico" x="68" y="222">π</text>
+          <text class="n-title" x="92" y="222">LLM / VLM Agent</text>
+          <text class="n-sub" x="60" y="252">multi-turn think · search · submit</text>
+          <g class="chip"><rect x="60" y="266" width="74" height="26" rx="13"/><text x="97" y="283">Qwen3.5-9B</text></g>
+          <g class="chip"><rect x="142" y="266" width="86" height="26" rx="13"/><text x="185" y="283">text + vision</text></g>
+          <text class="n-form" x="152" y="318">πθ(aₜ | sₜ)</text>
+        </g>
+
+        <!-- GYM environment -->
+        <g class="node" id="n-gym" data-c="gym">
+          <rect x="350" y="110" width="255" height="300" rx="18"/>
+          <text class="n-ico" x="378" y="150">⬢</text>
+          <text class="n-title" x="404" y="150">Healthcare AI GYM</text>
+          <text class="n-sub mono" x="372" y="178">reset() · step(a) · render()</text>
+          <g class="domaingrid" id="domainGrid"></g>
+          <text class="n-foot" x="478" y="392" text-anchor="middle">10 clinical domains · 3.6K+ tasks</text>
+        </g>
+
+        <!-- Tools -->
+        <g class="node" id="n-tools" data-c="tools">
+          <rect x="712" y="128" width="218" height="124" rx="16"/>
+          <text class="n-ico" x="738" y="164">ƒ</text>
+          <text class="n-title" x="760" y="164">135 Clinical Tools</text>
+          <g class="chip"><rect x="732" y="180" width="62" height="24" rx="12"/><text x="763" y="196">Search</text></g>
+          <g class="chip"><rect x="800" y="180" width="64" height="24" rx="12"/><text x="832" y="196">Assess</text></g>
+          <g class="chip"><rect x="732" y="212" width="66" height="24" rx="12"/><text x="765" y="228">Actions</text></g>
+          <g class="chip"><rect x="804" y="212" width="78" height="24" rx="12"/><text x="843" y="228">Reasoning</text></g>
+        </g>
+
+        <!-- KB -->
+        <g class="node" id="n-kb" data-c="kb">
+          <rect x="712" y="300" width="218" height="124" rx="16"/>
+          <text class="n-ico" x="738" y="336">▤</text>
+          <text class="n-title" x="762" y="336">828K-Passage KB</text>
+          <g class="chip"><rect x="732" y="352" width="68" height="24" rx="12"/><text x="766" y="368">MedCPT</text></g>
+          <g class="chip"><rect x="806" y="352" width="58" height="24" rx="12"/><text x="835" y="368">BioQA</text></g>
+          <text class="n-sub" x="746" y="402">BM25 retrieval · SQLite</text>
+        </g>
+
+        <!-- Reward -->
+        <g class="node" id="n-reward" data-c="reward">
+          <rect x="985" y="128" width="172" height="124" rx="16"/>
+          <text class="n-ico" x="1009" y="164">R</text>
+          <text class="n-title" x="1030" y="164">5D Reward</text>
+          <text class="n-rwd" x="1071" y="194" text-anchor="middle">Acc · Proc · Safe</text>
+          <text class="n-rwd" x="1071" y="212" text-anchor="middle">Fmt · Coh</text>
+          <text class="n-sub" x="1071" y="236" text-anchor="middle">+ cosine length ctrl</text>
+        </g>
+
+        <!-- RL Training -->
+        <g class="node" id="n-rl" data-c="rl">
+          <rect x="985" y="300" width="172" height="124" rx="16"/>
+          <text class="n-ico" x="1009" y="336">∇</text>
+          <text class="n-title" x="1030" y="336">RL Trainer</text>
+          <g class="chip"><rect x="1006" y="352" width="56" height="24" rx="12"/><text x="1034" y="368">GRPO</text></g>
+          <g class="chip"><rect x="1068" y="352" width="68" height="24" rx="12"/><text x="1102" y="368">TT-OPD</text></g>
+          <text class="n-sub" x="1071" y="402" text-anchor="middle">policy-gradient update</text>
+        </g>
+
+        <!-- loop badge (shown on the loop step) -->
+        <g class="loopbadge" id="loopBadge">
+          <rect x="250" y="150" width="92" height="30" rx="15"/>
+          <text x="296" y="170" text-anchor="middle">↻ ×Tₘₐₓ turns</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- ===== CAPTION + CONTROLS ===== -->
+    <div class="diagram__panel">
+      <div class="stepcard" id="archCard">
+        <div class="stepcard__top">
+          <span class="stepcard__no" id="archNo">01</span>
+          <span class="stepcard__tag" id="archTag">reset()</span>
+        </div>
+        <h3 class="stepcard__title" id="archTitle">Patient case is loaded</h3>
+        <p class="stepcard__body" id="archBody">The environment samples a clinical task and returns the first observation — a patient scenario plus the available tool menu — to the agent.</p>
+      </div>
+
+      <div class="controls">
+        <button class="ctl" id="archPrev" aria-label="Previous step">
+          <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="ctl ctl--play" id="archPlay" aria-label="Play">
+          <svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+        </button>
+        <button class="ctl" id="archNext" aria-label="Next step">
+          <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="ctl ctl--text" id="archRestart" aria-label="Restart">Restart</button>
+      </div>
+
+      <ol class="dots" id="archDots"></ol>
+      <div class="progress"><i id="archProgress"></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTRIBUTIONS ============ -->
+<section class="section" id="contributions">
+  <div class="kicker">Contributions</div>
+  <h2 class="h2">Five contributions</h2>
+  <div class="cards cards--5">
+    <article class="card"><div class="card__no">01</div>
+      <h3>Multi-Domain Medical Gymnasium</h3>
+      <p>A Gymnasium-compatible environment: 10 clinical domains, 3.6K+ tasks, 135 domain-specific tools, an 828K-passage knowledge base, and a safety-aware 5D reward.</p>
+    </article>
+    <article class="card"><div class="card__no">02</div>
+      <h3>Systematic RL Benchmark</h3>
+      <p>A rigorous comparison of GRPO, DAPO, Dr.&nbsp;GRPO and GSPO that exposes the trade-off between peak accuracy (62.0%) and training stability.</p>
+    </article>
+    <article class="card card--accent"><div class="card__no">03</div>
+      <h3>TT-OPD Framework</h3>
+      <p>Outcome-aware regularization: correctness signals are injected into the teacher's context but withheld from the student, giving dense turn-by-turn guidance with controlled response length.</p>
+    </article>
+    <article class="card"><div class="card__no">04</div>
+      <h3>Systematic OPD Failure Analysis</h3>
+      <p>Ablations trace the failure progression — KL collapse → response explosion — and identify <em>multi-turn collapse</em> as an agentic-specific failure mode absent from single-turn OPD.</p>
+    </article>
+    <article class="card"><div class="card__no">05</div>
+      <h3>Transfer Gap Analysis</h3>
+      <p>RL-driven procedural competence (+22% composite reward) does not automatically translate to text QA, due to a 51:1 format-reward dilution ratio.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ ENVIRONMENT ============ -->
+<section class="section" id="environment">
+  <div class="kicker">The environment</div>
+  <h2 class="h2">Inside Healthcare AI GYM</h2>
+
+  <div class="env">
+    <!-- domains -->
+    <div class="env__block env__domains">
+      <h3 class="env__h"><span class="dot" style="--c:var(--gym)"></span>10 Clinical Domains</h3>
+      <ul class="domainlist" id="domainList"></ul>
+    </div>
+
+    <!-- tools + kb -->
+    <div class="env__col">
+      <div class="env__block">
+        <h3 class="env__h"><span class="dot" style="--c:var(--tools)"></span>135 Tools · 4 types</h3>
+        <ul class="tooltypes">
+          <li><b>Evidence Retrieval</b><span>BM25 over 828K passages</span></li>
+          <li><b>Clinical Assessment</b><span>22 validated scores — SOFA, NEWS, PHQ-9…</span></li>
+          <li><b>Intervention Actions</b><span>labs, imaging, prescribing, triage</span></li>
+          <li><b>Reasoning Scaffolds</b><span>differential dx, planning, ICD-10</span></li>
+        </ul>
+      </div>
+      <div class="env__block">
+        <h3 class="env__h"><span class="dot" style="--c:var(--kb)"></span>828K-Passage Knowledge Base</h3>
+        <p class="env__p">PubMed abstracts, clinical guidelines (AHA, ACOG, SSC) and textbooks, indexed via BM25 and exposed as tool calls. Built on Self-BioRAG and OLAPH.</p>
+      </div>
+    </div>
+
+    <!-- 5D reward -->
+    <div class="env__block env__reward">
+      <h3 class="env__h"><span class="dot" style="--c:var(--reward)"></span>Safety-Aware 5D Reward</h3>
+      <p class="env__p mono small">R = w·Acc + w·Proc + w·Safe + w·Fmt + w·Coh</p>
+      <ul class="rewardbars" id="rewardBars"></ul>
+      <p class="env__note">A critical safety violation caps the composite score at <b>0.1</b> — directly countering format-reward dilution. An optional assertion dimension (0.15) is added when rubric annotations exist.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TT-OPD ============ -->
+<section class="section section--wide" id="ttopd">
+  <div class="kicker">Method</div>
+  <h2 class="h2">TT-OPD: stabilizing multi-turn agentic RL</h2>
+  <p class="section-intro">
+    On-policy distillation collapses in agentic settings because the teacher goes stale as the student
+    explores. TT-OPD keeps a <b>gradient-free EMA teacher</b> and feeds it <b>outcome-aware hints</b> that the
+    student never sees — turning sparse terminal rewards into dense, per-turn guidance. Press <b>Play</b> to
+    walk through one optimization step.
+  </p>
+
+  <!-- animated pipeline (Figure 2) -->
+  <div class="diagram diagram--pipe" id="ttDiagram">
+    <div class="diagram__stage">
+      <svg viewBox="0 0 1120 440" class="scene" id="ttScene" role="img" aria-label="Animated TT-OPD training pipeline">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" class="arrowhead"/>
+          </marker>
+        </defs>
+
+        <g class="wires">
+          <path id="t-sc"  class="wire" data-c="gym"    marker-end="url(#arrow2)" d="M250 220 L312 220"/>
+          <path id="t-ct"  class="wire" data-c="reward" marker-end="url(#arrow2)" d="M522 220 L584 220"/>
+          <path id="t-tu"  class="wire" data-c="rl"     marker-end="url(#arrow2)" d="M794 220 L856 220"/>
+          <path id="t-up"  class="wire wire--arc" data-c="rl" marker-end="url(#arrow2)"
+                d="M962 158 L962 86 Q 962 66 942 66 L 160 66 Q 140 66 140 86 L 140 156"/>
+          <path id="t-ema" class="wire wire--arc wire--dash" data-c="kb" marker-end="url(#arrow2)"
+                d="M140 286 L140 360 Q 140 380 160 380 L 648 380 Q 668 380 668 360 L 668 288"/>
+          <text class="wlab" x="281" y="210">trajectories</text>
+          <text class="wlab" x="553" y="210">correct / wrong</text>
+          <text class="wlab" x="825" y="210">logprobs</text>
+          <text class="wlab" x="551" y="56" text-anchor="middle">∇θₛ ℒ — update student</text>
+          <text class="wlab" x="404" y="398" text-anchor="middle">EMA:  θ_T ← α·θ_T + (1−α)·θ_S   (no gradient)</text>
+        </g>
+
+        <!-- Student -->
+        <g class="node" id="t-student" data-c="agent">
+          <rect x="40" y="156" width="210" height="130" rx="16"/>
+          <circle class="badgebg" cx="62" cy="178" r="11"/>
+          <text class="badge" x="62" y="178">1</text>
+          <text class="n-title" x="86" y="182">Student πθₛ</text>
+          <text class="n-sub" x="60" y="210">rollout · n = 3 trajectories</text>
+          <text class="n-sub" x="60" y="232">multi-turn think / search / submit</text>
+          <g class="traj"><rect x="60" y="246" width="54" height="22" rx="6"/><rect x="120" y="246" width="54" height="22" rx="6"/><rect x="180" y="246" width="54" height="22" rx="6"/></g>
+        </g>
+        <!-- Classification -->
+        <g class="node" id="t-classify" data-c="reward">
+          <rect x="312" y="156" width="210" height="130" rx="16"/>
+          <circle class="badgebg" cx="334" cy="178" r="11"/>
+          <text class="badge" x="334" y="178">2</text>
+          <text class="n-title" x="358" y="182">Classification</text>
+          <text class="n-sub" x="332" y="210">outcome → hint</text>
+          <g class="chip chip--ok"><rect x="332" y="226" width="174" height="22" rx="11"/><text x="419" y="241">✓ confirmatory cue</text></g>
+          <g class="chip chip--no"><rect x="332" y="254" width="174" height="22" rx="11"/><text x="419" y="269">✗ diagnostic redirection</text></g>
+        </g>
+        <!-- Teacher -->
+        <g class="node" id="t-teacher" data-c="rl">
+          <rect x="584" y="156" width="210" height="130" rx="16"/>
+          <circle class="badgebg" cx="606" cy="178" r="11"/>
+          <text class="badge" x="606" y="178">3</text>
+          <text class="n-title" x="630" y="182">Teacher πθ_T</text>
+          <text class="n-sub" x="604" y="210">EMA copy of student</text>
+          <text class="n-sub" x="604" y="232">re-scores w/ hint context</text>
+          <text class="n-form2" x="689" y="262" text-anchor="middle">log πθ_T(aₜ | sₜ⁺)</text>
+        </g>
+        <!-- Update -->
+        <g class="node" id="t-update" data-c="tools">
+          <rect x="856" y="156" width="224" height="130" rx="16"/>
+          <circle class="badgebg" cx="878" cy="178" r="11"/>
+          <text class="badge" x="878" y="178">4</text>
+          <text class="n-title" x="902" y="182">Policy Update</text>
+          <g class="chip"><rect x="876" y="200" width="186" height="24" rx="12"/><text x="969" y="216">ℒ_GRPO(R_cos)</text></g>
+          <g class="chip"><rect x="876" y="232" width="186" height="24" rx="12"/><text x="969" y="248">λ · D_KL(πθₛ ‖ πθ_T)</text></g>
+          <text class="n-sub" x="968" y="276" text-anchor="middle">turn-level · truncated</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="diagram__panel">
+      <div class="stepcard" id="ttCard">
+        <div class="stepcard__top">
+          <span class="stepcard__no" id="ttNo">01</span>
+          <span class="stepcard__tag" id="ttTag">rollout</span>
+        </div>
+        <h3 class="stepcard__title" id="ttTitle">Student rollout</h3>
+        <p class="stepcard__body" id="ttBody">For each prompt, the student samples n = 3 multi-turn trajectories — interleaving think, search and submit actions in the GYM.</p>
+      </div>
+      <div class="controls">
+        <button class="ctl" id="ttPrev" aria-label="Previous step"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="ctl ctl--play" id="ttPlay" aria-label="Play">
+          <svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+        </button>
+        <button class="ctl" id="ttNext" aria-label="Next step"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button class="ctl ctl--text" id="ttRestart" aria-label="Restart">Restart</button>
+      </div>
+      <ol class="dots" id="ttDots"></ol>
+      <div class="progress"><i id="ttProgress"></i></div>
+    </div>
+  </div>
+
+  <!-- three components -->
+  <div class="cards cards--3 mt">
+    <article class="card"><div class="card__ico" style="--c:var(--rl)">θ_T</div>
+      <h3>Gradient-free EMA teacher</h3>
+      <p>θ_T ← 0.995·θ_T + 0.005·θ_S, updated every 5 steps with a hard-copy fallback every 30 — the teacher tracks the student without ever taking a gradient.</p>
+    </article>
+    <article class="card"><div class="card__ico" style="--c:var(--reward)">h(τ)</div>
+      <h3>Outcome-conditioned hints</h3>
+      <p>Correct trajectories get confirmatory cues, incorrect ones get corrective redirection. Hints enter the teacher's context but are removed from its logprobs — the student never sees them.</p>
+    </article>
+    <article class="card"><div class="card__ico" style="--c:var(--gym)">R_cos</div>
+      <h3>Cosine length control</h3>
+      <p>Concise correct answers are rewarded most; reward decays with length and incorrect answers are penalized more as they grow — preventing monotonic explosion toward L_max.</p>
+    </article>
+  </div>
+
+  <!-- failure modes -->
+  <h3 class="h3 mt2">Self-distillation is fragile: three failure modes</h3>
+  <p class="section-intro section-intro--tight">Distillation is most valuable early (steps 1–40) and should be <b>monotonically phased out</b> — not adaptively toggled. Each run dies a different death.</p>
+  <div class="fails">
+    <div class="fail"><div class="fail__tag">v29</div>
+      <h4>Teacher corruption cascade</h4>
+      <p>Unconditional EMA absorbs corrupted student weights; once KL&nbsp;&gt;&nbsp;0.7 a positive feedback loop collapses accuracy to 0%.</p>
+      <div class="fail__meta">death @ step 70 · 10 steps</div>
+    </div>
+    <div class="fail"><div class="fail__tag">v30</div>
+      <h4>Frozen teacher gap cascade</h4>
+      <p>A static distill coef (4.0) is 10–20× the RL gradient; when the frozen teacher goes stale it overwhelms optimization.</p>
+      <div class="fail__meta">death @ step 74 · 50 steps</div>
+    </div>
+    <div class="fail fail--novel"><div class="fail__tag">v31 · novel</div>
+      <h4>Adaptive re-engagement explosion</h4>
+      <p>After distillation auto-disables for 100+ steps, a natural KL drop re-engages a 120-step-stale teacher → grad explosion (142→301) → permanent learning arrest.</p>
+      <div class="fail__meta">death @ step 145 · 5 steps</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="section section--wide" id="results">
+  <div class="kicker">Results</div>
+  <h2 class="h2">TT-OPD wins 10 of 18 benchmarks</h2>
+  <p class="section-intro">
+    All models use a <b>Qwen3.5-9B</b> backbone. <b>Base (text)</b> is single-turn log-prob evaluation with no
+    tools; <b>Base+AR</b> adds the multi-turn AgentRunner (135 tools + 828K KB) without RL; <b>GRPO</b> and
+    <b>TT-OPD</b> are RL-trained. Best per row is highlighted.
+  </p>
+
+  <div class="tablewrap">
+    <table class="rtable">
+      <thead>
+        <tr><th>Category</th><th>Benchmark</th><th>Base<span>text</span></th><th>Base<span>+AR</span></th><th>GRPO</th><th>TT-OPD</th></tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="3" class="cat">MC QA</td><td>MedQA (USMLE)</td><td>70.7</td><td>78.8</td><td>85.5</td><td class="best">87.1</td></tr>
+        <tr><td>MMLU-Med. (6 sub.)</td><td class="best">83.8</td><td>60.6</td><td>60.1</td><td>65.5</td></tr>
+        <tr><td>MedMCQA</td><td>63.8</td><td>55.8</td><td>58.0</td><td class="best">66.2</td></tr>
+        <tr><td rowspan="6" class="cat">Visual QA</td><td>VQA-RAD</td><td>52.5</td><td class="best">63.2</td><td>60.7</td><td>63.1</td></tr>
+        <tr><td>PathVQA</td><td>40.5</td><td>38.7</td><td>41.5</td><td class="best">45.3</td></tr>
+        <tr><td>SLAKE</td><td class="best">79.0</td><td>30.6</td><td>29.5</td><td>32.1</td></tr>
+        <tr><td>PMC-VQA</td><td class="best">57.9</td><td>35.1</td><td>34.2</td><td>38.9</td></tr>
+        <tr><td>VQA-Med-2021</td><td>8.6</td><td>9.8</td><td>10.7</td><td class="best">15.2</td></tr>
+        <tr><td>Quilt-VQA</td><td>25.2</td><td>27.8</td><td>25.2</td><td class="best">30.7</td></tr>
+        <tr><td rowspan="2" class="cat">EHR</td><td>MIMIC-III</td><td>58.5</td><td>62.1</td><td>61.1</td><td class="best">62.7</td></tr>
+        <tr><td>eICU</td><td>53.2</td><td>55.9</td><td>55.5</td><td class="best">57.1</td></tr>
+        <tr><td rowspan="5" class="cat">LFQA</td><td>LiveQA</td><td>53.2</td><td>58.2</td><td>57.7</td><td class="best">62.5</td></tr>
+        <tr><td>MedicationQA</td><td>49.5</td><td>53.1</td><td>55.8</td><td class="best">60.9</td></tr>
+        <tr><td>HealthSearchQA</td><td>39.8</td><td>41.9</td><td>39.5</td><td class="best">45.3</td></tr>
+        <tr><td>KQA-Golden</td><td>55.7</td><td>62.1</td><td class="best">65.3</td><td>64.1</td></tr>
+        <tr><td>KQA-Silver</td><td>52.5</td><td>61.7</td><td class="best">64.9</td><td>62.8</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="findings">
+    <div class="finding"><b>Broad competence.</b> TT-OPD is best on 10/18 benchmarks across MC QA, Visual QA, EHR and LFQA — +3.9 pp average over Base+AR.</div>
+    <div class="finding"><b>Agentic overhead.</b> Multi-turn evaluation trades parametric precision for retrieval-augmented reasoning (MMLU 83.8 → 60.6 → 65.5).</div>
+    <div class="finding"><b>GRPO peaks on recall.</b> Vanilla GRPO leads on KQA-Golden/Silver — higher peak training accuracy aids open-ended factual recall.</div>
+    <div class="finding"><b>Stability, not raw accuracy.</b> TT-OPD's win is controlled length (5.7–9.3K tok) and sustained 7.0–7.4 turns throughout training.</div>
+  </div>
+
+  <figure class="resultfig">
+    <img src="assets/img/training_dynamics.png" alt="Training dynamics: validation accuracy, KL divergence, response length and average turns for TT-OPD vs GRPO." loading="lazy" />
+    <figcaption>Training dynamics over 60 steps. TT-OPD (red) controls response length and preserves 7.0–7.4 turns, while GRPO oscillates and EMA-only distillation declines toward single-turn behavior.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ ANALYSIS: TOOL INTERNALIZATION ============ -->
+<section class="section section--wide analysis" id="analysis">
+  <div class="kicker">Deeper analysis</div>
+  <h2 class="h2">Does RL <em>internalize</em> tool use — or copy-paste the prompt?</h2>
+  <p class="section-intro analysis__lead">
+    A follow-up study asks whether agentic RL writes tool-use reasoning into the model's weights, or
+    whether the agent is just reading the tool spec from its context window. We answer it with
+    <b>Progressive Spec Withdrawal (PSW)</b> — a curriculum that strips tool definitions out of the prompt
+    during training — and a forensic taxonomy of <b>31,500+</b> tool calls.
+  </p>
+
+  <!-- PSW stat tiles -->
+  <div class="pswstats">
+    <div class="pswstat">
+      <div class="pswstat__big"><span class="countup" data-to="19" data-from="55">55</span></div>
+      <div class="pswstat__lbl"><b>Tool vocabulary collapse</b><span>unique tools invoked falls 55 → 19 once specs are withdrawn</span></div>
+    </div>
+    <div class="pswstat">
+      <div class="pswstat__big"><span class="countup" data-to="93.5" data-from="21.2" data-suffix="%">21%</span></div>
+      <div class="pswstat__lbl"><b>Reward-driven pruning</b><span><code>search_pubmed</code> share rises 21.2% → 93.5% — the model keeps only its most reward-efficient tool</span></div>
+    </div>
+    <div class="pswstat pswstat--hl">
+      <div class="pswstat__big"><span class="countup" data-to="86" data-suffix="%">0%</span></div>
+      <div class="pswstat__lbl"><b>Already latent</b><span>base, GRPO and PSW all hit the <i>same</i> 86% on MedQA with <b>no</b> tool specs — RL adds no new parametric tool encoding</span></div>
+    </div>
+  </div>
+  <p class="analysis__note">
+    Accuracy actually <b>rises</b> after specs are removed (58.0% → 61.7%, matching GRPO's 62.0% peak), and PSW
+    reaches 90% <i>with</i> specs — so the curriculum teaches the model to better <b>exploit</b> tool definitions,
+    not to memorize a capability the base model's post-training already had.
+  </p>
+
+  <!-- Tool hallucination taxonomy -->
+  <h3 class="h3 mt2">A taxonomy of tool hallucination</h3>
+  <p class="section-intro section-intro--tight">Across 31,500+ tool calls, failures fall into four distinct modes — each with its own cause and its own signature over training.</p>
+  <div class="taxo">
+    <article class="tax"><div class="tax__code" style="--c:var(--kb)">SH</div>
+      <h4>Schema Hallucination</h4>
+      <p>A real tool is called with parameters that don't exist in its schema.</p>
+      <div class="tax__tag">&lt; 0.1% · spikes early, fades at convergence</div>
+    </article>
+    <article class="tax"><div class="tax__code" style="--c:var(--tools)">PTI</div>
+      <h4>Phantom Tool Invocation</h4>
+      <p>Entirely fabricated tools (<code>web_search</code>, <code>google_search</code>) that were never defined.</p>
+      <div class="tax__tag">driven by pre-training leakage</div>
+    </article>
+    <article class="tax tax--hl"><div class="tax__code" style="--c:var(--rl)">SM</div>
+      <h4>Structural Malformation</h4>
+      <p>Broken JSON or unclosed tags that abort the call before it runs.</p>
+      <div class="tax__tag">🐤 the canary — primary stability predictor</div>
+    </article>
+    <article class="tax"><div class="tax__code" style="--c:var(--reward)">STM</div>
+      <h4>Semantic Tool Misuse</h4>
+      <p>Correct syntax, wrong tool for the job — the right call in the wrong place.</p>
+      <div class="tax__tag">causes redundant retrieval loops</div>
+    </article>
+  </div>
+  <div class="emergebox">
+    <span class="emergebox__ic">↻</span>
+    <p><b>RL self-corrects its own vocabulary.</b> When specs are withdrawn, phantom tool names surface around steps 35–100 — then reward pressure prunes them away by step 300. Only tools that produce valid, correct answers survive.</p>
+  </div>
+</section>
+
+<!-- ============ CITATION ============ -->
+<section class="section section--narrow" id="cite">
+  <div class="kicker">Citation</div>
+  <h2 class="h2">Cite this work</h2>
+  <div class="bibtex">
+    <button class="copybtn" id="copyBib" aria-label="Copy BibTeX">Copy</button>
+    <pre id="bibtex">@article{jeong2026healthcareaigym,
+  title   = {Healthcare AI GYM: A Comprehensive Empirical Study of
+             Multi-Turn Agentic RL for Medical AI},
+  author  = {Jeong, Minbyul},
+  journal = {arXiv preprint arXiv:2605.02943},
+  year    = {2026}
+}</pre>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer__grid">
+    <div>
+      <div class="footer__brand">Healthcare AI <b>GYM</b></div>
+      <p>A Gymnasium-compatible environment and the TT-OPD framework for training medical AI agents through multi-turn clinical tool use.</p>
+    </div>
+    <div class="footer__links">
+      <a href="https://arxiv.org/abs/2605.02943" target="_blank" rel="noopener">arXiv</a>
+      <a href="https://github.com/minstar/helathcare-ai-gym" target="_blank" rel="noopener">GitHub</a>
+      <a href="#cite">BibTeX</a>
+    </div>
+  </div>
+  <div class="footer__note">
+    <span>Apache License 2.0</span>
+    <span class="footer__disc">⚠︎ All patient data is synthetic. Research tool only — <b>not</b> for clinical use or medical decision-making.</span>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
