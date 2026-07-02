@@ -1,12 +1,12 @@
 # Healthcare AI GYM — Project Page
 
 [![arXiv](https://img.shields.io/badge/arXiv-2605.02943-b31b1b.svg)](https://arxiv.org/abs/2605.02943)
-[![Page](https://img.shields.io/badge/project-page-0d9488.svg)](https://minstar.github.io/helathcare-ai-gym/)
+[![Page](https://img.shields.io/badge/project-page-0d9488.svg)](https://minstar.github.io/healthcare-ai-gym/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 Project / landing page for the paper **“Healthcare AI GYM for Medical Agents”** (arXiv 2605.02943).
 
-🔗 **Live page:** https://minstar.github.io/helathcare-ai-gym/
+🔗 **Live page:** https://minstar.github.io/healthcare-ai-gym/
 
 ---
 
@@ -43,7 +43,7 @@ browser loads `assets/` over `http://` rather than `file://`.)
 
 1. Push to `main` (already the case for this repo).
 2. **Settings → Pages → Build and deployment → Source: “Deploy from a branch”**, branch **`main`**, folder **`/ (root)`**.
-3. The site goes live at `https://minstar.github.io/helathcare-ai-gym/` within a minute.
+3. The site goes live at `https://minstar.github.io/healthcare-ai-gym/` within a minute.
 
 `.nojekyll` is included so the files are served verbatim (no Jekyll processing).
 
